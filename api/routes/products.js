@@ -65,7 +65,7 @@ router.post('/', (req, res, next) => {
 
 })
 
-router.get('/:productId', async (req, res, next) => {
+router.get('/:productId', (req, res, next) => {
     const id = req.params.productId;
 
     Product.findById(id)
@@ -93,30 +93,26 @@ router.get('/:productId', async (req, res, next) => {
     });
 })
 
-router.patch('/:productId', async (req, res, next) => {
-    const product = await Product.findById(req.params.productId).exec();
-    if (!product) {
-        return res.status(404).json({
-            error: 'Product with given ID was not found'
-        });
-    }
-
-    //only patch values that values are changed
-    //dont edit whole object
-    let query = { $set: {} };
-    for (let key in req.body) {
-        if (product[key] && product[key] !== req.body[key]) {
-            query.$set[key] = req.body[key];
-        }
-    }
-    Product.updateOne({ _id: req.params.productId }, query).exec()
-    .then((response) => {
-        res.status(200).json({
-            message: 'Product edited successfully',
-            request: {
-                method: 'GET',
-                url: `http://localhost:3000/products/${product._id}`
+router.patch('/:productId', (req, res, next) => {
+    Product.findById(req.params.productId).exec()
+    .then(product => {
+        //only patch values that values are changed
+        //dont edit whole object
+        let query = { $set: {} };
+        for (let key in req.body) {
+            if (product[key] && product[key] !== req.body[key]) {
+                query.$set[key] = req.body[key];
             }
+        }
+        Product.updateOne({ _id: req.params.productId }, query).exec()
+        .then((response) => {
+            res.status(200).json({
+                message: 'Product edited successfully',
+                request: {
+                    method: 'GET',
+                    url: `http://localhost:3000/products/${product._id}`
+                }
+            })
         })
     })
     .catch((err) => {
@@ -126,30 +122,23 @@ router.patch('/:productId', async (req, res, next) => {
     })
 })
 
-router.delete('/:productId', async (req, res, next) => {
-    const id = req.params.productId;
-    const productTodelete = await Product.findById(id).exec();
-
-    if (!productTodelete) {
-        return res.status(404).json({
-            error: 'Product with given ID is not found on server'
-        });
-    }
-
-    Product.remove({
-        _id: id
-    })
+router.delete('/:productId', (req, res, next) => {
+    Product.findByIdAndRemove(req.params.productId)
     .exec()
-    .then((response) => {
+    .then(product => {
+        if (!product) {
+            return res.status(404).json({
+                message: 'Product not found!'
+            });
+        }
         res.status(200).json({
-            message: 'Product deleted'
+            message: 'Product deleted!'
         });
     })
-    .catch((err) => {
+    .catch(err => {
         res.status(500).json({
             error: err
-        });
+        })
     })
-
-})
+});
 module.exports = router;
