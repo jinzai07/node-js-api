@@ -4,12 +4,27 @@ const mongoose = require('mongoose');
 const Product = require('../models/product');
 
 router.get('/', (req, res, next) => {
-    Product.find().exec()
+    Product.find()
+    .select('name price _id')
+    .exec()
     .then((products) => {
         if (products.length >= 0) {
-            res.status(200).json({
-                data: products
-            });
+            const response = {
+                count: products.length,
+                products: products.map(product => {
+                        return {
+                            name: product.name,
+                            price: product.price,
+                            id: product._id,
+                            request: {
+                                method: 'GET',
+                                url: `http://localhost:3000/products/${product._id}`
+                            }
+                        }
+                    }
+                )
+            }
+            res.status(200).json(response);
         }
     })
     .catch((err) => {
@@ -29,8 +44,16 @@ router.post('/', (req, res, next) => {
     product.save()
     .then((createdProduct) => {
         res.status(201).json({
-            message: 'POST request to /products',
-            product: createdProduct
+            message: 'Created product successfully',
+            product: {
+                name: createdProduct.name,
+                price: createdProduct.price,
+                _id: createdProduct._id,
+                request: {
+                    method: 'GET',
+                    url: `http://localhost:3000/products/${createdProduct._id}`
+                }
+            }
         });
     })
     .catch((err) => {
@@ -44,13 +67,19 @@ router.post('/', (req, res, next) => {
 
 router.get('/:productId', async (req, res, next) => {
     const id = req.params.productId;
-    const product = Product.findById(id);
 
     Product.findById(id)
+    .select('name price _id')
     .exec()
     .then((product) => {
         if (product) {
-            res.status(200).json(product);
+            res.status(200).json({
+                product: product,
+                request: {
+                    method: 'GET',
+                    url: 'http://localhost:3000/products'
+                }
+            });
         } else {
             res.status(404).json({
                 message: 'Not found for provided ID'
@@ -80,9 +109,15 @@ router.patch('/:productId', async (req, res, next) => {
             query.$set[key] = req.body[key];
         }
     }
-    await Product.updateOne({ _id: req.params.productId }, query).exec()
+    Product.updateOne({ _id: req.params.productId }, query).exec()
     .then((response) => {
-        res.status(200).json(response)
+        res.status(200).json({
+            message: 'Product edited successfully',
+            request: {
+                method: 'GET',
+                url: `http://localhost:3000/products/${product._id}`
+            }
+        })
     })
     .catch((err) => {
         res.status(500).json({
@@ -106,7 +141,9 @@ router.delete('/:productId', async (req, res, next) => {
     })
     .exec()
     .then((response) => {
-        res.status(200).json(response);
+        res.status(200).json({
+            message: 'Product deleted'
+        });
     })
     .catch((err) => {
         res.status(500).json({
