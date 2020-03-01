@@ -26,6 +26,7 @@ app.use(cors());
 //avail routes
 app.use('/products', productRoutes);
 app.use('/orders', orderRoute);
+app.use('/uploads', express.static('uploads'));
 
 //code block if no route
 app.use((req, res, next) => {
@@ -37,7 +38,6 @@ app.use((req, res, next) => {
 //err handling block
 app.use((error, req, res, next) => {
     res.status(error.status || 500);
-    console.log(process.env.MONGO_ATLAS_PW);
     res.json({
         error: {
             message: error.message
