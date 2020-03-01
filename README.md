@@ -3,6 +3,7 @@
 <h3>Main Technologies/Libraries used:</h3>
 <h4>Backend framework:</h4>
 <ul>
+    <li>NodeJS</li>
     <li>ExpressJS</li>
     <li>Mongoose</li>
 </ul>
@@ -20,7 +21,9 @@
 </ul>
 
 <h4>References:</h4>
-<ul> 
+<ul>
+    <li>NodeJS: https://nodejs.org/en/ </li>
+    <li>MongoDB: https://www.mongodb.com/ </li>
     <li>ExpressJS: https://expressjs.com/ </li>
     <li>Mongoose: https://mongoosejs.com/ </li>
     <li>Multer: https://www.npmjs.com/package/multer</li>
