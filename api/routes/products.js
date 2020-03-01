@@ -96,6 +96,11 @@ router.get('/:productId', (req, res, next) => {
 router.patch('/:productId', (req, res, next) => {
     Product.findById(req.params.productId).exec()
     .then(product => {
+        if (!product) {
+            return res.status(404).json({
+                message: 'Product not found!'
+            });
+        }
         //only patch values that values are changed
         //dont edit whole object
         let query = { $set: {} };
@@ -103,9 +108,9 @@ router.patch('/:productId', (req, res, next) => {
             if (product[key] && product[key] !== req.body[key]) {
                 query.$set[key] = req.body[key];
             }
-        }
+        };
         Product.updateOne({ _id: req.params.productId }, query).exec()
-        .then((response) => {
+        .then(() => {
             res.status(200).json({
                 message: 'Product edited successfully',
                 request: {
