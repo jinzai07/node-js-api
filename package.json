@@ -13,7 +13,6 @@
     "@babel/core": "^7.8.7",
     "@babel/node": "^7.8.7",
     "@babel/preset-env": "^7.8.7",
-    "body-parser": "^1.19.0",
     "morgan": "^1.9.1",
     "nodemon": "^2.0.2"
   },
