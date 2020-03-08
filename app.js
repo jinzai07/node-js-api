@@ -1,5 +1,4 @@
 
-import bodyParser from 'body-parser';
 import cors from 'cors';
 import express from 'express';
 import mongoose from 'mongoose';
@@ -12,6 +11,7 @@ const app = express();
 */
 import productRoute from './api/routes/products';
 import orderRoute from './api/routes/orders';
+import userRoute from './api/routes/user';
 
 /*
     connect to mongoDB
@@ -28,8 +28,8 @@ mongoose.connect(
     initialize app middlewares
 */
 app.use(morgan('dev'));
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 app.use(cors());
 
 /*
@@ -38,12 +38,13 @@ app.use(cors());
 app.use('/products', productRoute);
 app.use('/orders', orderRoute);
 app.use('/uploads', express.static('uploads'));
+app.use('/user', userRoute);
 
 /*
     code block if no route available
 */
 app.use((req, res, next) => {
-    const error = new Error('Not found');
+    const error = new Error('Route not found!');
     error.status = 404;
     next(error);
 })
@@ -61,4 +62,4 @@ app.use((error, req, res, next) => {
 })
 
 
-module.exports = app;
+export default app;
