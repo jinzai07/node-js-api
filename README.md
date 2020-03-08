@@ -20,6 +20,11 @@
     <li>MVC</li>
 </ul>
 
+<h4>Authentication:</h4>
+<ul>
+    <li>jwt</li>
+</ul>
+
 <h4>References:</h4>
 <ul>
     <li>NodeJS: https://nodejs.org/en/ </li>
@@ -27,4 +32,5 @@
     <li>ExpressJS: https://expressjs.com/ </li>
     <li>Mongoose: https://mongoosejs.com/ </li>
     <li>Multer: https://www.npmjs.com/package/multer</li>
+    <li>jwt: https://jwt.io/</li>
 </ul>
