@@ -1,41 +1,56 @@
-const express = require('express');
+
+import bodyParser from 'body-parser';
+import cors from 'cors';
+import express from 'express';
+import mongoose from 'mongoose';
+import morgan from 'morgan';
+
 const app = express();
-const morgan = require('morgan');
-const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
-const cors = require('cors');
 
-//routes
-const productRoutes = require('./api/routes/products');
-const orderRoute = require('./api/routes/orders');
+/*
+    import routes
+*/
+import productRoute from './api/routes/products';
+import orderRoute from './api/routes/orders';
 
+/*
+    connect to mongoDB
+*/
 mongoose.connect(
-    'mongodb+srv://node-rest-shop:biancak33@node-rest-shop-kmbhr.mongodb.net/test?retryWrites=true&w=majority',
+    `mongodb+srv://node-rest-shop:${process.env.DB_PASSWORD}@node-rest-shop-kmbhr.mongodb.net/test?retryWrites=true&w=majority`,
     {
         useNewUrlParser: true,
         useUnifiedTopology: true
     }
 )
 
-//middlewares
+/*
+    initialize app middlewares
+*/
 app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors());
 
-//avail routes
-app.use('/products', productRoutes);
+/*
+    bootstrap available routes
+*/
+app.use('/products', productRoute);
 app.use('/orders', orderRoute);
 app.use('/uploads', express.static('uploads'));
 
-//code block if no route
+/*
+    code block if no route available
+*/
 app.use((req, res, next) => {
     const error = new Error('Not found');
     error.status = 404;
     next(error);
 })
 
-//err handling block
+/*
+    error handling
+*/
 app.use((error, req, res, next) => {
     res.status(error.status || 500);
     res.json({
@@ -44,4 +59,6 @@ app.use((error, req, res, next) => {
         }
     })
 })
+
+
 module.exports = app;

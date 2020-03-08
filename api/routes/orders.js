@@ -1,9 +1,14 @@
-const express = require('express');
-const router = express.Router();
-const mongoose = require('mongoose');
-const Order = require('../models/order');
-const Product = require('../models/product');
+import express from 'express';
+import mongoose from 'mongoose';
 
+import Order from '../models/order';
+import Product from '../models/product';
+
+const router = express.Router();
+
+/*
+    GET all orders
+*/
 router.get('/', async (req, res, next) => {
     Order.find()
     .select('_id product quantity')
@@ -29,9 +34,12 @@ router.get('/', async (req, res, next) => {
         res.status(500).json({
             error: err
         });
-    });
-});
+    })
+})
 
+/*
+    POST new order
+*/
 router.post('/', (req, res, next) => {
     Product.findById(req.body.productId)
     .exec()
@@ -66,9 +74,12 @@ router.post('/', (req, res, next) => {
         res.status(500).json({
             error: err
         });
-    });
-});
+    })
+})
 
+/*
+    GET order by ID
+*/
 router.get('/:orderId', (req, res, next) => {
     Order.findById(req.params.orderId)
     .select('_id product quantity')
@@ -92,15 +103,18 @@ router.get('/:orderId', (req, res, next) => {
         res.status(500).json({
             error: err
         });
-    });
-});
+    })
+})
 
+/*
+    DEL order
+*/
 router.delete('/:orderId', async (req, res, next) => {
     Order.findByIdAndRemove(req.params.orderId)
     .exec()
     .then(order => {
         if (!order) {
-            res.status(404).json({
+            return res.status(404).json({
                 message: 'Order not found!'
             });
         };
@@ -111,8 +125,8 @@ router.delete('/:orderId', async (req, res, next) => {
     .catch(err => {
         res.status(500).json({
             error: err
-        })
+        });
     })
-});
+})
 
 module.exports = router;
