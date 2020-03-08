@@ -1,8 +1,13 @@
-const express = require('express');
+import express from 'express';
+import mongoose from 'mongoose';
+import multer from 'multer';
+
+import Product from '../models/product';
+
 const router = express.Router();
-const mongoose = require('mongoose');
-const Product = require('../models/product');
-const multer = require('multer');
+/*
+    initialize image upload config
+*/
 const upload = multer({
     storage: multer.diskStorage({
         destination: (req, file, cb) => cb(null, './uploads/'),
@@ -24,13 +29,15 @@ const upload = multer({
     }
 });
 
-
+/*
+    GET products
+*/
 router.get('/', (req, res, next) => {
     Product.find()
     .select('name price _id productImage')
     .exec()
     .then((products) => {
-        if (products.length >= 0) {
+        if (products.length) {
             const response = {
                 count: products.length,
                 products: products.map(product => {
@@ -57,6 +64,9 @@ router.get('/', (req, res, next) => {
     })
 })
 
+/*
+    POST product
+*/
 router.post('/', upload.single('productImage'), (req, res, next) => {
     const product = new Product({
         _id: new mongoose.Types.ObjectId(),
@@ -87,6 +97,9 @@ router.post('/', upload.single('productImage'), (req, res, next) => {
     });
 })
 
+/*
+    GET product by ID
+*/
 router.get('/:productId', (req, res, next) => {
     const id = req.params.productId;
 
@@ -94,19 +107,18 @@ router.get('/:productId', (req, res, next) => {
     .select('name price _id productImage')
     .exec()
     .then((product) => {
-        if (product) {
-            res.status(200).json({
-                product: product,
-                request: {
-                    method: 'GET',
-                    url: 'http://localhost:3000/products'
-                }
-            });
-        } else {
-            res.status(404).json({
+        if (!product) {
+            return res.status(404).json({
                 message: 'Not found for provided ID'
             })
         }
+        res.status(200).json({
+            product: product,
+            request: {
+                method: 'GET',
+                url: 'http://localhost:3000/products'
+            }
+        });
     })
     .catch((err) => {
         res.status(500).json({
@@ -115,6 +127,9 @@ router.get('/:productId', (req, res, next) => {
     });
 })
 
+/*
+    PATCH product
+*/
 router.patch('/:productId', (req, res, next) => {
     Product.findById(req.params.productId).exec()
     .then(product => {
@@ -131,7 +146,8 @@ router.patch('/:productId', (req, res, next) => {
                 query.$set[key] = req.body[key];
             }
         };
-        Product.updateOne({ _id: req.params.productId }, query).exec()
+        Product.updateOne({ _id: req.params.productId }, query)
+        .exec()
         .then(() => {
             res.status(200).json({
                 message: 'Product edited successfully',
@@ -149,6 +165,9 @@ router.patch('/:productId', (req, res, next) => {
     })
 })
 
+/*
+    DEL product by ID
+*/
 router.delete('/:productId', (req, res, next) => {
     Product.findByIdAndRemove(req.params.productId)
     .exec()
@@ -168,4 +187,6 @@ router.delete('/:productId', (req, res, next) => {
         })
     })
 });
+
+
 module.exports = router;
