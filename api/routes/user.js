@@ -87,15 +87,11 @@ router.post('/login', (req, res, next) => {
             };
             if (result) {
                 //create token for user
-                const token = jwt.sign(
-                {
+                const token = jwt.sign({
                     email: user.email,
                     userId: user._id
-                },
-                    process.env.JWT_KEY,
-                {
-                    expiresIn: '1h'
-                });
+                }, process.env.JWT_KEY,
+                { expiresIn: '1h' });
 
                 res.status(200).json({
                     message: 'Auth successful!',

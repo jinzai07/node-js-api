@@ -4,12 +4,13 @@ import mongoose from 'mongoose';
 import Order from '../models/order';
 import Product from '../models/product';
 
+import checkAuth from '../middlewares/check-auth';
 const router = express.Router();
 
 /*
     GET all orders
 */
-router.get('/', async (req, res, next) => {
+router.get('/', checkAuth, (req, res, next) => {
     Order.find()
     .select('_id product quantity')
     .populate('product', '_id name price')
@@ -40,7 +41,7 @@ router.get('/', async (req, res, next) => {
 /*
     POST new order
 */
-router.post('/', (req, res, next) => {
+router.post('/', checkAuth, (req, res, next) => {
     Product.findById(req.body.productId)
     .exec()
     .then(product => {
@@ -80,7 +81,7 @@ router.post('/', (req, res, next) => {
 /*
     GET order by ID
 */
-router.get('/:orderId', (req, res, next) => {
+router.get('/:orderId', checkAuth, (req, res, next) => {
     Order.findById(req.params.orderId)
     .select('_id product quantity')
     .populate('product', '_id name')
@@ -109,7 +110,7 @@ router.get('/:orderId', (req, res, next) => {
 /*
     DEL order
 */
-router.delete('/:orderId', async (req, res, next) => {
+router.delete('/:orderId', checkAuth, (req, res, next) => {
     Order.findByIdAndRemove(req.params.orderId)
     .exec()
     .then(order => {
