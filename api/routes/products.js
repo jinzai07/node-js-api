@@ -4,6 +4,8 @@ import multer from 'multer';
 
 import Product from '../models/product';
 
+import checkAuth from '../middlewares/check-auth';
+
 const router = express.Router();
 /*
     initialize image upload config
@@ -67,7 +69,7 @@ router.get('/', (req, res, next) => {
 /*
     POST product
 */
-router.post('/', upload.single('productImage'), (req, res, next) => {
+router.post('/', checkAuth, upload.single('productImage'), (req, res, next) => {
     const product = new Product({
         _id: new mongoose.Types.ObjectId(),
         name: req.body.name,
@@ -100,7 +102,7 @@ router.post('/', upload.single('productImage'), (req, res, next) => {
 /*
     GET product by ID
 */
-router.get('/:productId', (req, res, next) => {
+router.get('/:productId', checkAuth, (req, res, next) => {
     const id = req.params.productId;
 
     Product.findById(id)
@@ -130,7 +132,7 @@ router.get('/:productId', (req, res, next) => {
 /*
     PATCH product
 */
-router.patch('/:productId', (req, res, next) => {
+router.patch('/:productId', checkAuth, (req, res, next) => {
     Product.findById(req.params.productId).exec()
     .then(product => {
         if (!product) {
@@ -168,7 +170,7 @@ router.patch('/:productId', (req, res, next) => {
 /*
     DEL product by ID
 */
-router.delete('/:productId', (req, res, next) => {
+router.delete('/:productId', checkAuth, (req, res, next) => {
     Product.findByIdAndRemove(req.params.productId)
     .exec()
     .then(product => {
