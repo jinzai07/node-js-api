@@ -18,6 +18,7 @@
 <h4>Architecture:</h4>
 <ul>
     <li>MVC</li>
+    <li>REST</li>
 </ul>
 
 <h4>Authentication:</h4>
